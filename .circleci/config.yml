@@ -168,7 +168,7 @@ jobs:
           name: 🐍 Python Unit Tests & ☕ JS Unit Tests
           command: |
             source venv/bin/activate
-            npm run test.unit
+            npm run citest.unit
 
 
   test-37: &test
@@ -191,7 +191,7 @@ jobs:
           command: |
             source venv/bin/activate
             set -eo pipefail
-            npm run test.integration
+            npm run citest.integration
       - store_artifacts:
           path: test-reports
       - store_test_results:
