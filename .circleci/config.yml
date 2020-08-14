@@ -45,9 +45,17 @@ commands:
             rm -rf venv && python -m venv venv && source venv/bin/activate
             npm install --production
             cd packages && ls -la
+
+            # Install all except dash proper
             find . -type f \( -name "dash*.gz" ! -name "dash?[0-9]*.gz" \) | xargs pip install --no-cache-dir --ignore-installed --progress-bar off
+
+            # Install dash package only to test if it installs...
             find . -name "dash*.gz" | xargs pip install --no-cache-dir --progress-bar off && cd ..
-            pip install --no-cache-dir -r requires-install.txt -r requires-dev.txt -r requires-testing.txt --progress-bar off
+
+            # ...because for testing we need to install in editable mode from the source directory,
+            # which uninstalls the sdist. Among other things, this adds the current working
+            # directory to sys.path, which is needed for some unit tests
+            pip install -e . --no-cache-dir -r requires-install.txt -r requires-dev.txt -r requires-testing.txt --progress-bar off
             pip list | grep dash
 
 
@@ -168,6 +176,7 @@ jobs:
           name: 🐍 Python Unit Tests & ☕ JS Unit Tests
           command: |
             source venv/bin/activate
+            pip install -e . --no-cache-dir -r requires-install.txt -r requires-dev.txt -r requires-testing.txt --progress-bar off
             npm run citest.unit
 
 
@@ -191,6 +200,7 @@ jobs:
           command: |
             source venv/bin/activate
             set -eo pipefail
+            pip install -e . -r re
             npm run citest.integration
       - store_artifacts:
           path: test-reports
